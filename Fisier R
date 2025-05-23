@@ -1,0 +1,72 @@
+Data_proiect <- serii_2
+
+Serie <- ts(Data_proiect$Numar, start = c(1993), end = c(2023), frequency = 1)
+
+plot.ts(Serie)
+
+diferenta2value <- diff(Serie, differences = 2)
+diferentavalue <- diff(Serie, differences = 1)
+
+diferenta2value
+diferentavalue
+
+library(urca)
+
+#Testul ADF pentru seria de doua ori diferentiata
+u1=ur.df(diferenta2value,type="trend",selectlags="AIC")
+summary(u1)
+u2=ur.df(diferenta2value,type="drift",selectlags="AIC")
+summary(u2)
+u3=ur.df(diferenta2value,type="none",selectlags="AIC")
+summary(u3)
+
+#Testul ADF pentru seria diferentiata o data
+
+v1=ur.df(diferentavalue,type="trend",selectlags="AIC")
+summary(v1)
+v2=ur.df(diferentavalue,type="drift",selectlags="AIC")
+summary(v2)
+v3=ur.df(diferentavalue,type="none",selectlags="AIC")
+summary(v3)
+
+#Testul ADF pentru seria initala
+
+w1=ur.df(Serie,type="trend",selectlags="AIC")
+summary(w1)
+w2=ur.df(Serie,type="drift",selectlags="AIC")
+summary(w2)
+w3=ur.df(Serie,type="none",selectlags="AIC")
+summary(w3)
+
+
+#Ajustarea cu functia auto.arima()
+library(forecast)
+
+model_arima <- auto.arima(Serie)
+summary(model_arima)
+
+tsdiag(model_arima)
+plot(forecast(model_arima,h=12))
+
+
+acf(Serie)
+pacf(Serie)
+adf.test(Serie)
+
+seriemodel = auto.arima(Serie, ic="aic", trace = TRUE)
+
+acf(ts(seriemodel$residuals))
+pacf(ts(seriemodel$residuals))
+adf.test(ts(seriemodel$residuals))
+
+forecastserie = forecast(seriemodel, lv = c(95), h=12)
+forecastserie
+plot(forecastserie)
+
+Box.test(forecastserie$resid, lag = 1, type = "Ljung-Box")
+Box.test(forecastserie$resid, lag = 5, type = "Ljung-Box")
+Box.test(forecastserie$resid, lag = 10, type = "Ljung-Box")
+Box.test(forecastserie$resid, lag = 15, type = "Ljung-Box")
+Box.test(forecastserie$resid, lag = 20, type = "Ljung-Box")
+
+tsdiag(seriemodel)
